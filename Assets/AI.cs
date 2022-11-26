@@ -17,6 +17,9 @@ public class AI : MonoBehaviour
 
     [SerializeField]
     private States _currentState;
+
+    private float AttackTime = 3f;
+    float _Timer = -1f;
     private enum States
     {
         Walking,
@@ -27,6 +30,7 @@ public class AI : MonoBehaviour
     void Start()
     {
         _agent = GetComponent<NavMeshAgent>();
+        _agent.destination = waypoints[0].position;
     }
 
     // Update is called once per frame
@@ -41,10 +45,20 @@ public class AI : MonoBehaviour
                 break;
             case States.Attacking:
                 Debug.Log("Attacking");
+                AttackState();
                 break;
             case States.Jumping:
                 Debug.Log("Jumping");
                 break;
+        }
+    }
+
+    private void AttackState()
+    {
+        if (Time.time >= _Timer)
+        {
+            _currentState = States.Walking;
+            _agent.isStopped = false;
         }
     }
 
@@ -59,9 +73,9 @@ public class AI : MonoBehaviour
 
     private void CalculateMovement()
     {
-        if (_agent.remainingDistance < .2f)
+
+        if (_agent.remainingDistance < .5f)
         {
-            _agent.destination = waypoints[_currentPoint].position;
             if (Reverse)
             {
                 Reversal();
@@ -70,7 +84,14 @@ public class AI : MonoBehaviour
             {
                 Forward();
             }
+            _currentState = States.Attacking;
+            _Timer = Time.time + AttackTime;
+            _agent.isStopped = true;
+            _agent.destination = waypoints[_currentPoint].position;
+
         }
+
+
     }
 
     void Forward()
