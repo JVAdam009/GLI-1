@@ -73,7 +73,6 @@ public class AI : MonoBehaviour
 
     private void CalculateMovement()
     {
-
         if (_agent.remainingDistance < .5f)
         {
             if (Reverse)
